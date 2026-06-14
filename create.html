@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create Post</title>
+
+<style>
+
+body{
+    background:#f4f6f9;
+    font-family:Arial,sans-serif;
+}
+
+.page-header{
+    background:white;
+    color:blue;
+    padding:15px;
+    text-align:center;
+}
+
+.container{
+    padding:15px;
+}
+
+.card{
+    background:white;
+    padding:15px;
+    border-radius:12px;
+    margin-bottom:15px;
+    box-shadow:0 2px 5px rgba(0,0,0,.1);
+}
+
+label{
+    display:block;
+    margin-top:10px;
+    margin-bottom:5px;
+    font-weight:bold;
+}
+
+textarea{
+    width:100%;
+    min-height:150px;
+    padding:10px;
+    border:1px solid #ddd;
+    border-radius:8px;
+    resize:vertical;
+}
+
+input[type="datetime-local"]{
+    width:100%;
+    padding:10px;
+    border:1px solid #ddd;
+    border-radius:8px;
+}
+
+input[type="file"]{
+    width:100%;
+    padding:10px;
+    border:1px solid #ddd;
+    border-radius:8px;
+    background:#fff;
+}
+
+button{
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:10px;
+    margin-top:10px;
+    font-size:16px;
+    cursor:pointer;
+}
+
+.ai-btn{
+    background:#6f42c1;
+    color:white;
+}
+
+.preview-btn{
+    background:#28a745;
+    color:white;
+}
+
+.save-btn{
+    background:#1877f2;
+    color:white;
+}
+
+.media-preview{
+    margin-top:15px;
+}
+
+.media-preview img{
+    width:100%;
+    max-height:250px;
+    object-fit:cover;
+    border-radius:10px;
+}
+
+.media-preview video{
+    width:100%;
+    max-height:300px;
+    border-radius:10px;
+}
+
+.preview-box{
+    background:#f7f7f7;
+    border:1px solid #ddd;
+    padding:10px;
+    border-radius:10px;
+    margin-top:10px;
+}
+
+.preview-box img{
+    width:100%;
+    max-height:250px;
+    object-fit:cover;
+    border-radius:10px;
+}
+
+.preview-box video{
+    width:100%;
+    max-height:300px;
+    border-radius:10px;
+}
+
+.bottom-nav{
+    
+ 
+    left:0;
+    right:0;
+    background:white;
+    display:flex;
+    justify-content:space-around;
+    padding:10px;
+    
+}
+a{
+    color:blue;
+    
+    text-decoration: none;
+}
+
+</style>
+</head>
+<body>
+
+<div class="page-header">
+    <h2>Create Scheduled Post</h2>
+    <!-- BOTTOM NAV -->
+
+</div>
+
+<div class="bottom-nav">
+    <a href="index.html"><img src="home.png" width="20px"></a>
+    <a href="create.html"><img src="add.png" width="20px"></a>
+    <a href="queue.html"> <img src="queue.png" width="20px">    </a>
+    <a href="settings.html"> <img src="setting.png" width="20px">  </a>
+</div>
+
+<div class="container">
+
+    <div class="card">
+
+        <label>Post Content</label>
+
+        <textarea
+            id="content"
+            placeholder="Write your Facebook content here..."
+        ></textarea>
+
+        
+
+        <label>Upload Image (Optional)</label>
+
+        <input
+            type="file"
+            id="imageFile"
+            accept="image/*"
+        >
+
+        <label>Upload Video (Optional)</label>
+
+        <input
+            type="file"
+            id="videoFile"
+            accept="video/*"
+        >
+
+        <div
+            id="mediaPreview"
+            class="media-preview"
+        ></div>
+
+        <label>Schedule Date & Time</label>
+
+        <input
+            type="datetime-local"
+            id="scheduleTime"
+        >
+
+        <button
+            class="preview-btn"
+            onclick="previewPost()"
+        >
+            Preview Post
+        </button>
+
+        <button
+            class="save-btn"
+            onclick="savePost()"
+        >
+            Save Schedule
+        </button>
+
+        <button
+        class="ai-btn"
+        onclick="openAI()"
+    >
+        ✨ Generate With ChatGPT
+    </button>
+
+    </div>
+
+    <div class="card">
+
+        <h3>Post Preview</h3>
+
+        <div
+            id="previewArea"
+            class="preview-box"
+        >
+            Nothing to preview yet.
+        </div>
+
+    </div>
+
+</div>
+
+
+<script src="js/db.js"></script>
+<script src="js/app.js"></script>
+
+<script>
+    
+
+let mediaData = "";
+let mediaType = "";
+document
+.getElementById("imageFile")
+.addEventListener("change", function(){
+
+    let file = this.files[0];
+
+    if(!file) return;
+
+    mediaType = "image";
+
+    let reader = new FileReader();
+
+    reader.onload = function(e){
+
+        mediaData = e.target.result;
+
+        document.getElementById("mediaPreview").innerHTML =
+        `
+        <img src="${mediaData}">
+        `;
+
+    };
+
+    reader.readAsDataURL(file);
+
+});
+
+
+document
+.getElementById("videoFile")
+.addEventListener("change", function(){
+
+    let file = this.files[0];
+
+    if(!file) return;
+
+    mediaType = "video";
+
+    let reader = new FileReader();
+
+    reader.onload = function(e){
+
+        mediaData = e.target.result;
+
+        document.getElementById("mediaPreview").innerHTML =
+        `
+        <video controls>
+            <source src="${mediaData}">
+        </video>
+        `;
+
+    };
+
+    reader.readAsDataURL(file);
+
+});
+
+
+function openAI(){
+
+    let topic =
+        document.getElementById("content").value;
+
+    if(topic.trim() === ""){
+
+        topic =
+        "Write a professional Facebook post";
+
+    }
+
+    let url =
+    "https://chatgpt.com/?q=" +
+    encodeURIComponent(topic);
+
+    window.open(url, "_blank");
+
+}
+
+
+function previewPost(){
+
+    let content =
+        document.getElementById("content").value;
+
+    let schedule =
+        document.getElementById("scheduleTime").value;
+
+    let html = "";
+
+    html += "<p><b>Content:</b></p>";
+    html += "<p>" + content + "</p>";
+
+    if(mediaData){
+
+        if(mediaType === "image"){
+
+            html +=
+            `
+            <br>
+            <img
+            src="${mediaData}">
+            `;
+
+        }
+
+        if(mediaType === "video"){
+
+            html +=
+            `
+            <br>
+            <video controls>
+                <source src="${mediaData}">
+            </video>
+            `;
+
+        }
+
+    }
+
+    html +=
+    "<br><br><b>Schedule:</b> " +
+    schedule;
+
+    document.getElementById("previewArea")
+    .innerHTML = html;
+
+}
+
+
+function savePost(){
+
+    let content =
+        document.getElementById("content")
+        .value.trim();
+
+    let scheduleTime =
+        document.getElementById("scheduleTime")
+        .value;
+
+    if(content === ""){
+
+        alert("Enter content");
+
+        return;
+
+    }
+
+    if(scheduleTime === ""){
+
+        alert("Select schedule time");
+
+        return;
+
+    }
+
+    createPost(
+        content,
+        mediaData,
+        scheduleTime
+    );
+
+    alert(
+        "Post scheduled successfully"
+    );
+
+    document.getElementById("content")
+    .value = "";
+
+    document.getElementById("scheduleTime")
+    .value = "";
+
+    document.getElementById("imageFile")
+    .value = "";
+
+    document.getElementById("videoFile")
+    .value = "";
+
+    mediaData = "";
+    mediaType = "";
+
+    document.getElementById("mediaPreview")
+    .innerHTML = "";
+
+    document.getElementById("previewArea")
+    .innerHTML =
+    "Nothing to preview yet.";
+
+}
+
+</script>
+
+</body>
+</html>
