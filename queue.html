@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scheduled Posts</title>
+
+<style>
+
+body{
+    background:#f4f6f9;
+    font-family:Arial,sans-serif;
+}
+
+.header{
+    background:#1877f2;
+    color:white;
+    text-align:center;
+    padding:15px;
+}
+
+.container{
+    padding:15px;
+}
+
+.post-card{
+    background:white;
+    border-radius:12px;
+    padding:15px;
+    margin-bottom:15px;
+    box-shadow:0 2px 5px rgba(0,0,0,.1);
+}
+
+.post-content{
+    margin-bottom:10px;
+}
+
+.post-time{
+    color:#666;
+    font-size:14px;
+}
+
+.post-status{
+    margin-top:10px;
+    font-weight:bold;
+}
+
+.pending{ color:orange; }
+.posted{ color:green; }
+.failed{ color:red; }
+
+.post-card img{
+    width:100%;
+    max-height:250px;
+    object-fit:cover;
+    border-radius:10px;
+    margin-top:10px;
+}
+
+.btn-group{
+    display:flex;
+    gap:10px;
+    margin-top:15px;
+}
+
+.btn{
+    flex:1;
+    border:none;
+    padding:10px;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+.delete-btn{
+    background:red;
+    color:white;
+}
+
+.refresh-btn{
+    background:#1877f2;
+    color:white;
+    width:100%;
+    margin-bottom:15px;
+}
+
+.empty{
+    text-align:center;
+    padding:30px;
+    color:#666;
+}
+
+</style>
+
+</head>
+<body>
+
+<div class="header">
+    <h2>📅 Scheduled Posts</h2>
+</div>
+
+<div class="container">
+
+    <button class="btn refresh-btn" onclick="loadPosts()">
+        Refresh Posts
+    </button>
+
+    <div id="postsContainer">
+        <div class="empty">Loading Posts...</div>
+    </div>
+
+</div>
+
+<script src="js/db.js"></script>
+<script src="js/app.js"></script>
+
+<script>
+
+window.onload = function(){
+    loadPosts();
+};
+
+
+/*
+=========================
+LOAD POSTS (DUAL MODE)
+=========================
+*/
+function loadPosts(){
+
+    let container =
+        document.getElementById("postsContainer");
+
+    container.innerHTML =
+        "<div class='empty'>Loading...</div>";
+
+    getPosts(function(posts){
+
+        if(!posts || posts.length === 0){
+
+            container.innerHTML =
+            `<div class="empty">No scheduled posts found</div>`;
+
+            return;
+        }
+
+        // sort by schedule time
+        posts.sort(function(a,b){
+            return new Date(a.schedule_time) -
+                   new Date(b.schedule_time);
+        });
+
+        let html = "";
+
+        posts.forEach(function(row){
+
+            html += `
+            <div class="post-card">
+
+                <div class="post-content">
+                    <strong>${escapeHtml(row.content)}</strong>
+                </div>
+
+                ${row.media ?
+                `<img src="${row.media}">`
+                : ""}
+
+                <div class="post-time">
+                    Scheduled: ${row.schedule_time}
+                </div>
+
+                <div class="post-status ${row.status}">
+                    Status: ${row.status}
+                </div>
+
+                <div>
+                    Retries: ${row.retries || 0}
+                </div>
+
+                <div class="btn-group">
+
+                    <button class="btn delete-btn"
+                        onclick="removePost(${row.id})">
+
+                        Delete
+
+                    </button>
+
+                </div>
+
+            </div>
+            `;
+        });
+
+        container.innerHTML = html;
+
+    });
+
+}
+
+
+/*
+=========================
+DELETE POST (DUAL MODE)
+=========================
+*/
+function removePost(id){
+
+    if(confirm("Delete this post?")){
+
+        deletePost(id);
+
+        loadPosts();
+
+    }
+
+}
+
+
+/*
+=========================
+ESCAPE HTML
+=========================
+*/
+function escapeHtml(text){
+
+    let div = document.createElement("div");
+    div.innerText = text;
+    return div.innerHTML;
+
+}
+
+</script>
+
+</body>
+</html>
