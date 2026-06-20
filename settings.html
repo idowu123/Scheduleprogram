@@ -1,0 +1,314 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Settings</title>
+<link rel="stylesheet" href="css/facebook-ui.css">
+<style>
+
+body{
+    margin:0;
+    font-family:Arial;
+    background:#f0f2f5;
+}
+
+
+
+.container{
+    padding:15px;
+}
+
+.card{
+    background:white;
+    padding:15px;
+    border-radius:12px;
+    margin-bottom:15px;
+    box-shadow:0 2px 5px rgba(0,0,0,.1);
+}
+
+#profilePreview{
+    width:220px;
+    height:200px;
+    
+    object-fit:cover;
+    display:block;
+    margin:0;
+    
+}
+
+input{
+    width:100%;
+    padding:10px;
+    margin-top:10px;
+    border:1px solid #ddd;
+    border-radius:8px;
+}
+
+button{
+    width:100%;
+    padding:12px;
+    margin-top:10px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+.save{
+    background:#1877f2;
+    color:white;
+}
+
+.dark-btn{
+    background:#333;
+    color:white;
+}
+
+.danger{
+    background:red;
+    color:white;
+}
+
+/* DARK MODE */
+.dark{
+    background:#18191a;
+    color:white;
+}
+
+.dark .card{
+    background:#242526;
+    color:white;
+}
+
+.dark input{
+    background:#3a3b3c;
+    color:white;
+    border:none;
+}
+
+
+.topbar{
+    position:fixed;
+    top:0;
+    left:0;
+    right:0;
+    height:50px;
+    background:white;
+    display:flex;
+    align-items:center;
+    padding:0 15px;
+    box-shadow:0 2px 5px rgba(0,0,0,.15);
+    z-index:1000;
+}
+
+</style>
+
+</head>
+<body>
+
+    <div class="topbar">
+
+       
+    
+        <div style="margin-left:auto;">
+            <a href="index.html">
+                <img src="home.png" width="22">
+            </a>
+        </div>
+    
+        <div style="margin-left:auto;">
+            <a href="create.html">
+                <img src="add.png" width="22">
+            </a>
+        </div>
+    
+        <div style="margin-left:auto;">
+            <a href="queue.html">
+                <img src="queue.png" width="22">
+            </a>
+        </div>
+    
+    
+        <div style="margin-left:auto;">
+            <a href="settings.html">
+                <img src="setting.png" width="22">
+            </a>
+        </div>
+    
+    </div>
+
+<div class="container">
+
+    <div class="card">
+        <h3>Profile</h3>
+
+        <img id="profilePreview" src="img/default.png">
+
+        <input type="file" id="profileImage">
+
+        <input type="text" id="name" placeholder="Enter name">
+
+        <button class="save" onclick="saveProfile()">
+            Save Profile
+        </button>
+    </div>
+
+    <div class="card">
+        <h3>Theme</h3>
+
+        <button class="dark-btn" onclick="toggleTheme()">
+            Toggle Dark Mode
+        </button>
+    </div>
+
+    <div class="card">
+        <h3>Storage Info</h3>
+
+        <p>
+            Posts: <span id="postCount">0</span>
+        </p>
+
+        <p>
+            Storage: <span id="storageSize">0 KB</span>
+        </p>
+    </div>
+
+    <div class="card">
+        <h3>Danger Zone</h3>
+
+        <button class="danger" onclick="clearPosts()">
+            Clear All Posts
+        </button>
+    </div>
+
+</div>
+
+<script>
+
+/* =========================
+   LOAD SETTINGS
+========================= */
+window.onload = function(){
+
+    applyTheme();
+
+    loadProfile();
+
+    loadStorageInfo();
+
+};
+
+/* =========================
+   PROFILE
+========================= */
+let selectedImage = "";
+
+document.getElementById("profileImage")
+.addEventListener("change", function(e){
+
+    let file = e.target.files[0];
+
+    let reader = new FileReader();
+
+    reader.onload = function(ev){
+
+        selectedImage = ev.target.result;
+
+        document.getElementById("profilePreview").src =
+        selectedImage;
+
+    };
+
+    reader.readAsDataURL(file);
+
+});
+
+function saveProfile(){
+
+    let name = document.getElementById("name").value;
+
+    localStorage.setItem("profile_name", name);
+
+    if(selectedImage){
+        localStorage.setItem("profile_image", selectedImage);
+    }
+
+    alert("Saved");
+}
+
+function loadProfile(){
+
+    let name = localStorage.getItem("profile_name");
+    let img = localStorage.getItem("profile_image");
+
+    if(name){
+        document.getElementById("name").value = name;
+    }
+
+    if(img){
+        document.getElementById("profilePreview").src = img;
+        selectedImage = img;
+    }
+}
+
+/* =========================
+   THEME
+========================= */
+function toggleTheme(){
+
+    let theme = localStorage.getItem("theme");
+
+    if(theme === "dark"){
+        localStorage.setItem("theme","light");
+    }else{
+        localStorage.setItem("theme","dark");
+    }
+
+    applyTheme();
+}
+
+function applyTheme(){
+
+    let theme = localStorage.getItem("theme");
+
+    if(theme === "dark"){
+        document.body.classList.add("dark");
+    }else{
+        document.body.classList.remove("dark");
+    }
+}
+
+/* =========================
+   STORAGE INFO
+========================= */
+function loadStorageInfo(){
+
+    let posts = JSON.parse(localStorage.getItem("posts") || "[]");
+
+    document.getElementById("postCount").innerText =
+    posts.length;
+
+    let size = new Blob([JSON.stringify(posts)]).size;
+
+    document.getElementById("storageSize").innerText =
+    (size / 1024).toFixed(2) + " KB";
+}
+
+/* =========================
+   CLEAR POSTS
+========================= */
+function clearPosts(){
+
+    if(confirm("Clear all posts?")){
+
+        localStorage.removeItem("posts");
+
+        alert("Deleted");
+    }
+}
+
+</script>
+
+</body>
+</html>
