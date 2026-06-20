@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SocialQ Queue</title>
+<style>
+body{font-family:Arial;background:#f4f6f9;margin:0;}
+.container{padding:15px;}
+.card{background:white;padding:15px;border-radius:12px;margin-bottom:15px;box-shadow:0 2px 5px rgba(0,0,0,.1);}
+.post{background:#fff;border-radius:10px;padding:12px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.08);}
+.pending{color:orange;} .posted{color:green;} .missed{color:red;}
+button{padding:7px;border:none;border-radius:6px;margin-right:5px;cursor:pointer;}
+.copy{background:green;color:white;}
+.share{background:#1877f2;color:white;}
+.delete{background:red;color:white;}
+small{color:#666;}
+h2{
+    color:#df6e4c;
+}
+
+.dark{background:#18191a;color:white;}
+.dark .card{background:#242526;color:white;}
+.dark .post{background:#3a3b3c;border:1px solid #555;color:white;}
+.dark small{color:#ccc;}
+.dark .header{background:white;}
+
+.header{
+background:white;height:50px;display:flex;align-items:center;
+padding:0 15px;position:sticky;top:0;z-index:1000;
+box-shadow:0 2px 5px rgba(0,0,0,.15);
+}
+.nav-item{margin-left:auto;}
+</style>
+</head>
+<body>
+
+<div class="header">
+<div class="nav-item"><a href="index.html"><img src="home.png" width="22"></a></div>
+<div class="nav-item"><a href="create.html"><img src="add.png" width="22"></a></div>
+<div class="nav-item"><a href="queue.html"><img src="queue.png" width="22"></a></div>
+<div class="nav-item"><a href="settings.html"><img src="setting.png" width="22"></a></div>
+</div>
+
+<center><h2>📅 SocialQ Queue</h2></center>
+
+<div class="container">
+<div class="card">
+<button onclick="loadQueue()">Refresh</button>
+<div id="queue"></div>
+</div>
+</div>
+
+<script>
+function applyTheme(){
+ let theme = localStorage.getItem("theme");
+ if(theme==="dark"){document.body.classList.add("dark");}
+ else{document.body.classList.remove("dark");}
+}
+
+window.addEventListener("load",function(){
+ applyTheme();
+ loadQueue();
+});
+
+window.addEventListener("storageUpdate",function(){
+ loadQueue();
+});
+
+function loadQueue(){
+ let posts = JSON.parse(localStorage.getItem("posts") || "[]");
+ if(posts.length===0){
+   document.getElementById("queue").innerHTML="No posts";
+   return;
+ }
+ posts.sort((a,b)=>new Date(a.schedule_time)-new Date(b.schedule_time));
+ let html="";
+ posts.forEach(p=>{
+ html += `<div class="post">
+ <b>${p.content}</b><br>
+ <small>${p.schedule_time}</small><br>
+ <div class="${p.status}">Status: ${p.status}</div><br>
+ <button class="copy" onclick="copyPost(${p.id})">Copy</button>
+ <button class="share" onclick="sharePost(${p.id})">Share</button>
+ <button class="delete" onclick="deletePost(${p.id})">Delete</button>
+ </div>`;
+ });
+ document.getElementById("queue").innerHTML=html;
+}
+
+function copyPost(id){
+ let posts=JSON.parse(localStorage.getItem("posts")||"[]");
+ posts.forEach(p=>{
+  if(p.id===id){
+   navigator.clipboard.writeText(p.content);
+   p.status="posted";
+  }
+ });
+ localStorage.setItem("posts",JSON.stringify(posts));
+ loadQueue();
+}
+
+function sharePost(id){
+ let posts=JSON.parse(localStorage.getItem("posts")||"[]");
+ let post=posts.find(p=>p.id===id);
+ if(!post) return;
+
+ post.status="posted";
+ localStorage.setItem("posts",JSON.stringify(posts));
+ loadQueue();
+
+ if(navigator.share){
+   navigator.share({title:"SocialQ Post",text:post.content});
+ }else{
+   navigator.clipboard.writeText(post.content);
+   alert("Post copied successfully. Paste it on any social platform.");
+ }
+}
+
+function deletePost(id){
+ let posts=JSON.parse(localStorage.getItem("posts")||"[]");
+ posts=posts.filter(p=>p.id!==id);
+ localStorage.setItem("posts",JSON.stringify(posts));
+ loadQueue();
+}
+</script>
+</body>
+</html>

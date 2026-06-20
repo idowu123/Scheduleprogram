@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scheduler Pro</title>
+
+<link rel="stylesheet" href="css/facebook-ui.css">
+
+<style>
+
+/* =========================
+FIXED TOP BAR
+========================= */
+
+
+
+
+.profile{
+    width:100px;
+    height:100px;
+    border-radius:50%;
+    background:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:bold;
+    color:#1877f2;
+}
+
+/* =========================
+PAGE
+========================= */
+body{
+    padding-top:30px;
+    padding-bottom:80px;
+    background:#f0f2f5;
+    font-family:Arial;
+}
+
+.card{
+    background:white;
+    margin:10px;
+    padding:15px;
+    border-radius:12px;
+    box-shadow:0 1px 3px rgba(0,0,0,0.1);
+}
+
+
+.stats{
+    display:flex;
+    gap:10px;
+}
+
+.stat-box{
+    flex:1;
+    background:#eef4ff;
+    padding:10px;
+    border-radius:10px;
+    text-align:center;
+}
+
+
+
+
+ #total{
+    color:blue;
+}
+
+
+ #posted{
+    color:green;
+}
+
+
+ #missed{
+    color:red;
+}
+
+
+ 
+ #startw{
+    color:blue;
+}
+
+ #startg{
+    color:green;
+}
+
+ #startr{
+    color:red;
+}
+#missedpost{
+    color:red;
+}
+.intro{
+    color:white;
+}
+
+/* DARK MODE */
+.dark{
+    background:#18191a;
+    color:white;
+}
+
+.dark .card{
+    background:#242526;
+    color:white;
+}
+
+.dark .stat-box{
+    background:#3a3b3c;
+    color:white;
+}
+
+.dark #total{
+    color:white;
+}
+
+
+.dark #posted{
+    color:green;
+}
+
+
+.dark #missed{
+    color:red;
+}
+
+
+.dark #fbintro{
+    color:white;
+}
+
+.dark #startw{
+    color:white;
+}
+
+.dark #startg{
+    color:green;
+}
+
+.dark #startr{
+    color:red;
+}
+.dark #menup{
+    color:white;
+}
+.dark .pman{
+color:white;
+}
+
+
+.topbar{
+    position:fixed;
+    top:0;
+    left:0;
+    right:0;
+    height:50px;
+    background:white;
+    display:flex;
+    align-items:center;
+    padding:0 15px;
+    box-shadow:0 2px 5px rgba(0,0,0,.15);
+    z-index:1000;
+}
+
+.intro{
+    color:#df6e4c;
+    margin:0;
+    font-size:20px;
+    font-weight:bold;
+}
+
+
+.menu{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+}
+
+.menu button{
+    background:purple;
+    color:white;
+   
+    padding:10px 12px;
+    border-radius:8px;
+    cursor:pointer;
+  
+}
+
+.social-links{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    
+}
+
+.social-btn{
+    background:purple;
+    color:white;
+   
+    padding:10px 14px;
+    border-radius:8px;
+    cursor:pointer;
+    
+    border-color: #ff9800;
+    border: nonex;
+}
+
+
+</style>
+</head>
+
+<body>
+
+
+
+
+<div class="topbar">
+
+    <h2 class="intro"><b> Social Q</b></h2>
+
+    <div style="margin-left:auto;">
+        <a href="index.html">
+            <img src="home.png" width="22">
+        </a>
+    </div>
+
+    <div style="margin-left:auto;">
+        <a href="create.html">
+            <img src="add.png" width="22">
+        </a>
+    </div>
+
+    <div style="margin-left:auto;">
+        <a href="queue.html">
+            <img src="queue.png" width="22">
+        </a>
+    </div>
+
+
+    <div style="margin-left:auto;">
+        <a href="settings.html">
+            <img src="setting.png" width="22">
+        </a>
+    </div>
+
+</div>
+
+
+
+
+
+<!-- PROFILE CARD -->
+<div class="card">
+    <div style="text-align:center;">
+       <center>  <div class="profile" id="userAvatar"></div></center><br>
+        <h3 id="userName">My Dashboard</h3><br>
+       
+        
+
+
+        <button onclick="toggleTheme()">
+            Toggle Dark Mode
+        </button>
+    </div>
+</div>
+
+<div class="card">
+
+    
+    <h3>🌐 Social Platforms</h3>
+        
+    <p class="pman"> 
+        Quick access to your social media accounts.
+    </p>
+
+    <h3>🚀 Share Anywhere</h3>
+
+    <p class="pman">
+        Copy your scheduled post and publish it on any platform.
+    </p>
+
+    <br>
+
+    <div class="social-links">
+
+        <button class="social-btn"
+            onclick="openPlatform('facebook')">
+            📘 Facebook
+        </button>
+
+        <button class="social-btn"
+            onclick="openPlatform('instagram')">
+            📸 Instagram
+        </button>
+
+        <button class="social-btn"
+            onclick="openPlatform('x')">
+            𝕏 X
+        </button>
+
+        <button class="social-btn"
+            onclick="openPlatform('threads')">
+            🧵 Threads
+        </button>
+
+        <button class="social-btn"
+            onclick="openPlatform('linkedin')">
+            💼 LinkedIn
+        </button>
+
+        <button class="social-btn"
+            onclick="openPlatform('youtube')">
+            ▶️ YouTube
+        </button>
+
+        <button class="social-btn"
+            onclick="openPlatform('tiktok')">
+            🎵 TikTok
+        </button>
+
+    </div>
+
+</div>
+
+<!-- MOTIVATION -->
+<div class="card">
+   
+
+    <h3>🔥 Social Media Post Made Easier</h3>
+
+    <p id="fbintro" style="line-height:1.6;">
+        Don't let busy schedules stop your growth.
+        Plan your content ahead, stay consistent,
+        and never forget to post again.
+        <br><br>
+        Create, schedule, copy, and share your Facebook posts from one place.
+        <br><br>
+        Start scheduling today and keep your audience engaged every day.
+    </p>
+</div>
+
+<!-- STATS -->
+<div class="card">
+    <h3>Stats</h3>
+
+    <div class="stats">
+        <div class="stat-box">
+            <h2 id="total">0</h2>
+            <p id="startw">Total</p>
+        </div>
+
+        <div class="stat-box">
+            <h2 id="posted">0</h2>
+            <p id="startg">Posted</p>
+        </div>
+
+        <div class="stat-box">
+            <h2 id="missed">0</h2>
+            <p id="startr">Missed</p>
+        </div>
+    </div>
+</div>
+
+<!-- UPCOMING -->
+<div class="card">
+    <h3>Upcoming Post</h3>
+    <div id="upcoming">Loading...</div>
+</div>
+
+<!-- MISSED -->
+<div class="card">
+    <h3 id="missedpost">Missed Posts</h3>
+    <div id="missedList"></div>
+</div>
+
+
+
+<div id="weekReminder" class="card" style="display:none; background:#fff3cd; border-left:5px solid #ff9800;">
+
+    <h3>📅 Weekly Scheduling Reminder</h3>
+
+    <p style="margin-top:10px; line-height:1.6;">
+        It’s weekend! This is the best time to plan your social post content for the week.
+        <br><br>
+
+        👉 Create <b>7 - 20 posts</b> now to boost your engagement and stay consistent.
+        <br><br>
+
+        Set your schedule date and time for each post so your dashboard stays active all week.
+    </p>
+
+    <br>
+
+    <a href="create.html">
+        <button style="background:#1877f2; color:white; padding:10px; border:none; border-radius:8px;">
+            Start Scheduling Now
+        </button>
+    </a>
+
+</div>
+
+<div class="card">
+
+    <h3>📰 Content & News Hub</h3>
+
+    <p id = "menup" style="margin-top:10px;">
+        Explore trusted news sources, get ideas, and turn trending stories into scheduled Facebook posts.
+    </p>
+
+    <br>
+
+    <div class="menu">
+
+        <a href="https://www.bbc.com/news" target="_blank">
+            <button>BBC English</button>
+        </a>
+
+        <a href="https://www.bbc.com/yoruba" target="_blank">
+            <button>BBC Yoruba</button>
+        </a>
+
+        <a href="https://www.bbc.com/pidgin" target="_blank">
+            <button>BBC Pidgin</button>
+        </a>
+
+        <a href="https://www.bbc.com/hausa" target="_blank">
+            <button>BBC Hausa</button>
+        </a>
+
+        <a href="https://www.bbc.com/igbo" target="_blank">
+            <button>BBC Igbo</button>
+        </a>
+
+        <a href="https://www.aljazeera.com" target="_blank">
+            <button>Al Jazeera</button>
+        </a>
+
+        <a href="https://punchng.com" target="_blank">
+            <button>Punch NG</button>
+        </a>
+
+        <a href="https://dailytimes.ng" target="_blank">
+            <button>Daily Times</button>
+        </a>
+
+    </div>
+
+</div>
+
+
+<script src="js/db.js"></script>
+<script src="js/app.js"></script>
+<script src="js/app-core.js"></script>
+<script src="js/worker.js"></script>
+
+
+<script>
+function openPlatform(platform){
+
+const links = {
+
+    facebook: "https://www.facebook.com",
+    instagram: "https://www.instagram.com",
+    x: "https://x.com",
+    threads: "https://www.threads.net",
+    linkedin: "https://www.linkedin.com",
+    youtube: "https://www.youtube.com",
+    tiktok: "https://www.tiktok.com"
+
+};
+
+window.open(
+    links[platform],
+    "_blank"
+);
+}
+
+
+/* =========================
+INIT (CLEAN FIX)
+========================= */
+window.addEventListener("load", function(){
+
+    applyTheme();
+    loadProfile();
+    loadUI();
+
+});
+
+/* =========================
+PROFILE
+========================= */
+function loadProfile(){
+
+    let name = localStorage.getItem("profile_name");
+    let img = localStorage.getItem("profile_image");
+
+    if(name){
+        document.getElementById("userName").innerText = name;
+    }
+
+    if(img){
+        document.getElementById("userAvatar").innerHTML =
+            `<img src="${img}" style="width:250%;height:250%; object-fit:fill;">`;
+    }
+}
+
+window.addEventListener("storageUpdate", function(){
+    loadUI();
+});
+
+
+/* =========================
+UI
+========================= */
+function loadUI(){
+
+
+    function showWeekReminder(){
+
+let day = new Date().getDay();
+
+// Saturday or Sunday only
+if(day === 0 || day === 6){
+
+    document.getElementById("weekReminder").style.display = "block";
+
+}else{
+
+    document.getElementById("weekReminder").style.display = "none";
+
+}
+}
+
+
+    let posts = JSON.parse(localStorage.getItem("posts") || "[]");
+
+    document.getElementById("total").innerText = posts.length;
+
+    document.getElementById("posted").innerText =
+        posts.filter(p => p.status === "posted").length;
+
+    document.getElementById("missed").innerText =
+        posts.filter(p => p.status === "missed").length;
+
+    loadUpcoming(posts);
+    loadMissed(posts);
+    showWeekReminder();
+}
+
+/* =========================
+UPCOMING
+========================= */
+function loadUpcoming(posts){
+
+    let now = new Date();
+
+    let upcoming = posts
+        .filter(p => new Date(p.schedule_time) > now)
+        .sort((a,b)=> new Date(a.schedule_time)-new Date(b.schedule_time));
+
+    if(upcoming.length > 0){
+
+        let post = upcoming[0];
+
+        document.getElementById("upcoming").innerHTML = `
+            <b>${post.content}</b><br><br>
+            <small>${post.schedule_time}</small><br><br>
+
+            <button onclick="copyPost(${post.id})">Copy</button>
+            <button onclick="sharePost(${post.id})">Share</button>
+        `;
+
+    }else{
+        document.getElementById("upcoming").innerHTML =
+        "No upcoming post";
+    }
+}
+
+/* =========================
+MISSED
+========================= */
+function loadMissed(posts){
+
+    let missed = posts.filter(p => p.status === "missed");
+
+    if(missed.length === 0){
+        document.getElementById("missedList").innerHTML =
+        "No missed posts";
+        return;
+    }
+
+    let html = "";
+
+    missed.forEach(p=>{
+        html += `
+        <div>
+            <b>${p.content}</b><br>
+            <small>${p.schedule_time}</small><br><br>
+
+            <button onclick="copyPost(${p.id})">Copy</button>
+            <button onclick="sharePost(${p.id})">Share</button>
+        </div><hr>`;
+    });
+
+    document.getElementById("missedList").innerHTML = html;
+}
+
+/* =========================
+ACTIONS
+========================= */
+function copyPost(id){
+
+    let posts = JSON.parse(localStorage.getItem("posts") || "[]");
+
+    posts.forEach(p=>{
+        if(p.id === id){
+            navigator.clipboard.writeText(p.content);
+            p.status = "posted";
+        }
+    });
+
+    localStorage.setItem("posts", JSON.stringify(posts));
+    loadUI();
+}
+
+
+function sharePost(id){
+
+let posts = JSON.parse(
+    localStorage.getItem("posts") || "[]"
+);
+
+let post = posts.find(p => p.id === id);
+
+if(!post) return;
+
+// Mark as posted immediately
+post.status = "posted";
+
+localStorage.setItem(
+    "posts",
+    JSON.stringify(posts)
+);
+
+// Refresh dashboard immediately
+loadUI();
+
+if(navigator.share){
+
+    navigator.share({
+        title: "SocialQ Post",
+        text: post.content
+    });
+
+}else{
+
+    navigator.clipboard.writeText(
+        post.content
+    );
+
+    alert(
+        "Post copied successfully.\n\nChoose a social platform and paste it."
+    );
+}
+}
+
+
+/* =========================
+THEME
+========================= */
+function toggleTheme(){
+
+    let theme = localStorage.getItem("theme");
+
+    localStorage.setItem("theme",
+        theme === "dark" ? "light" : "dark"
+    );
+
+    applyTheme();
+}
+
+function applyTheme(){
+
+    let theme = localStorage.getItem("theme");
+
+    if(theme === "dark"){
+        document.body.classList.add("dark");
+    }else{
+        document.body.classList.remove("dark");
+    }
+}
+
+</script>
+
+</body>
+</html>
