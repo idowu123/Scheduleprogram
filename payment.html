@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -35,11 +34,19 @@ h2,h3{text-align:center;}
 
 .sub{text-align:center;color:#94a3b8;}
 
+input{
+    width:100%;
+    padding:10px;
+    margin-top:8px;
+    border-radius:6px;
+    border:none;
+}
+
 .plan{
     background:#0f172a;
-    padding:15px;
-    border-radius:10px;
-    margin-top:12px;
+    padding:10px;
+    border-radius:8px;
+    margin-top:10px;
 }
 
 button{
@@ -48,38 +55,25 @@ button{
     border:none;
     border-radius:8px;
     margin-top:12px;
-    font-size:16px;
     cursor:pointer;
+    font-size:16px;
 }
 
 .payBtn{background:#22c55e;color:white;}
-.reqBtn{background:#f59e0b;color:black;}
+.reqBtn{background:#3b82f6;color:white;}
 .backBtn{background:#64748b;color:white;}
 
-.popup{
+.deviceBox{
     display:none;
-    position:fixed;
-    top:0;left:0;
-    width:100%;height:100%;
-    background:rgba(0,0,0,0.7);
-    justify-content:center;
-    align-items:center;
-}
-
-.popup-box{
-    background:#1e293b;
-    padding:20px;
-    width:90%;
-    max-width:400px;
-    border-radius:12px;
-}
-
-input{
-    width:100%;
+    margin-top:15px;
+    background:#0f172a;
     padding:10px;
-    margin-top:10px;
     border-radius:8px;
-    border:none;
+}
+
+#deviceId{
+    color:#22c55e;
+    font-weight:bold;
 }
 </style>
 </head>
@@ -89,10 +83,17 @@ input{
 <div class="container">
 <div class="card">
 
-<h2>Buy Passkey</h2>
+<h2 style="color:#ff9800;">SOCIAL Q</h2>
+<h3>Buy Passkey</h3>
 
-<p class="sub">Select plan and pay OR request passkey if already paid</p>
+<p class="sub">Select plan and pay</p>
 
+<!-- USER INFO FORM -->
+<input id="username" placeholder="Username">
+<input id="email" placeholder="Email">
+<input id="phone" placeholder="Phone">
+
+<!-- PLAN -->
 <div class="plan">
 <label><input type="radio" name="plan" value="Weekly" checked> Weekly - ₦50</label>
 </div>
@@ -107,13 +108,18 @@ input{
 
 <button class="payBtn" onclick="payNow()">Pay Now</button>
 
-<p style="text-align:center;margin-top:10px;">
-If you have paid, click below:
+<p class="sub" style="margin-top:10px;">
+If you have paid already, request your passkey below 👇
 </p>
 
-<button class="reqBtn" onclick="openRequestPopup()">
+<button class="reqBtn" onclick="requestPasskey()">
 Request Passkey
 </button>
+
+<div class="deviceBox" id="deviceBox">
+<h3>Your Device ID</h3>
+<p id="deviceId"></p>
+</div>
 
 <button class="backBtn" onclick="location.href='license.html'">
 Back
@@ -122,26 +128,131 @@ Back
 </div>
 </div>
 
-<!-- POPUP FORM -->
-<div class="popup" id="popup">
-<div class="popup-box">
+<script>
 
-<h3>Request Passkey</h3>
+/* =========================
+LICENSE POOL (UNCHANGED)
+========================= */
+const LICENSE_POOL = {
+"DEV-45389216":"947256",
+"DEV-45389226":"182991",
+"DEV-88391022":"550112",
+"DEV-11223344":"778899"
+};
 
-<input id="name" placeholder="Full Name">
-<input id="email" placeholder="Email">
-<input id="phone" placeholder="Phone">
 
-<button class="payBtn" onclick="submitRequest()">
-Send Request
-</button>
+/* =========================
+DEVICE ID (ONLY FROM POOL)
+========================= */
+function getDeviceId(){
 
-<button class="backBtn" onclick="closePopup()">
-Close
-</button>
+let id = localStorage.getItem("device_id");
 
-</div>
-</div>
+if(!id){
+    const keys = Object.keys(LICENSE_POOL);
+    id = keys[Math.floor(Math.random() * keys.length)];
+    localStorage.setItem("device_id", id);
+}
+
+return id;
+}
+
+
+/* =========================
+GET PLAN AMOUNT
+========================= */
+function getAmount(){
+const plan = document.querySelector('input[name="plan"]:checked').value;
+
+if(plan === "Weekly") return 50;
+if(plan === "Monthly") return 1000;
+if(plan === "Yearly") return 10000;
+}
+
+
+/* =========================
+PAYSTACK
+========================= */
+function payNow(){
+
+const email = document.getElementById("email").value || "user@email.com";
+
+const amount = getAmount();
+
+const handler = PaystackPop.setup({
+
+key: "pk_live_ff6f89169eb0390d93a0777c949d59a3982a21e4",
+email: email,
+amount: amount * 100,
+currency: "NGN",
+
+callback: function(response){
+
+// SAVE PAYMENT INFO (NO RELIANCE FOR SECURITY)
+localStorage.setItem("payment_status", "paid");
+localStorage.setItem("payment_ref", response.reference);
+
+// GET DEVICE
+const device = getDeviceId();
+
+// SHOW DEVICE ALWAYS
+document.getElementById("deviceId").innerText = device;
+document.getElementById("deviceBox").style.display = "block";
+
+alert("Payment successful (you can now request passkey)");
+
+},
+
+onClose: function(){
+alert("Payment window closed");
+}
+
+});
+
+handler.openIframe();
+}
+
+
+/* =========================
+REQUEST PASSKEY (ALWAYS ENABLED)
+========================= */
+function requestPasskey(){
+
+const username = document.getElementById("username").value || "Unknown";
+const email = document.getElementById("email").value || "Unknown";
+const phone = document.getElementById("phone").value || "Unknown";
+
+const plan = document.querySelector('input[name="plan"]:checked').value;
+const ref = localStorage.getItem("payment_ref") || "NO-REF";
+const device = getDeviceId();
+
+const msg = `
+Hello Admin,
+
+I want my passkey.
+
+Username: ${username}
+Email: ${email}
+Phone: ${phone}
+Plan: ${plan}
+Payment Ref: ${ref}
+Device ID: ${device}
+
+Please generate my license.
+`;
+
+window.open(
+"https://wa.me/2347010067689?text=" + encodeURIComponent(msg),
+"_blank"
+);
+
+}
+
+</script>
+
+</body>
+</html>
+    
 
 <script>
 
@@ -226,129 +337,4 @@ const LICENSE_POOL = {
 /* =========================
 DEVICE ID (MUST EXIST ALREADY)
 ========================= */
-function getDeviceId(){
-    return localStorage.getItem("device_id");
-}
 
-/* =========================
-PLAN PRICE
-========================= */
-function getAmount(){
-    const plan=document.querySelector('input[name="plan"]:checked').value;
-    if(plan=="Weekly") return 50;
-    if(plan=="Monthly") return 1000;
-    if(plan=="Yearly") return 10000;
-}
-
-/* =========================
-PAYSTACK PAYMENT
-========================= */
-function payNow(){
-
-const amount=getAmount();
-
-const handler=PaystackPop.setup({
-key:"pk_live_ff6f89169eb0390d93a0777c949d59a3982a21e4",
-
-email:"user@email.com",
-
-amount:amount*100,
-currency:"NGN",
-
-callback:function(response){
-
-localStorage.setItem("payment_status","paid");
-localStorage.setItem("payment_ref",response.reference);
-
-alert("Payment successful. You can now request passkey.");
-
-},
-
-onClose:function(){
-alert("Payment not completed");
-}
-
-});
-
-handler.openIframe();
-}
-
-/* =========================
-REQUEST BUTTON (IMPORTANT PART)
-========================= */
-function openRequestPopup(){
-
-const status=localStorage.getItem("payment_status");
-
-function openRequestPopup(){
-
-    const status = localStorage.getItem("payment_status");
-
-    // we DON'T block anymore
-    // we only label the request type
-
-    if(status === "paid"){
-        console.log("Auto verified payment flag found");
-    }else{
-        console.log("Manual verification required");
-    }
-
-    document.getElementById("popup").style.display = "flex";
-}
-
-
-function closePopup(){
-document.getElementById("popup").style.display="none";
-}
-
-/* =========================
-SEND REQUEST TO ADMIN
-========================= */
-function submitRequest(){
-
-const device=getDeviceId();
-
-if(!device){
-    alert("No device found. Go back and register first.");
-    return;
-}
-
-const data={
-name:document.getElementById("name").value,
-email:document.getElementById("email").value,
-phone:document.getElementById("phone").value,
-plan:document.querySelector('input[name="plan"]:checked').value,
-deviceId:device,
-paymentRef:localStorage.getItem("payment_ref")
-};
-
-const msg=`PASSKEY REQUEST:
-
-Name: ${data.name}
-Email: ${data.email}
-Phone: ${data.phone}
-Plan: ${data.plan}
-Device ID: ${data.deviceId}
-Payment Ref: ${data.paymentRef}
-
-Please generate passkey using LICENSE_POOL.`;
-
-window.open(
-"https://wa.me/2347010067689?text="+encodeURIComponent(msg),
-"_blank"
-);
-
-closePopup();
-
-alert("Request sent to admin");
-}
-
-</script>
-
-</body>
-</html>
-
-
-
-
-    
