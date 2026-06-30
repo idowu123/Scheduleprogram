@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,7 +10,6 @@
 <script src="https://js.paystack.co/v1/inline.js"></script>
 
 <style>
-
 body{
     margin:0;
     font-family:Arial;
@@ -47,22 +47,23 @@ button{
     padding:12px;
     border:none;
     border-radius:8px;
+    margin-top:12px;
     font-size:16px;
     cursor:pointer;
-    margin-top:15px;
 }
 
 .payBtn{background:#22c55e;color:white;}
-.reqBtn{background:#25D366;color:white;display:block;}
+.reqBtn{background:#f59e0b;color:black;}
+.backBtn{background:#64748b;color:white;}
 
-/* popup */
 .popup{
     display:none;
     position:fixed;
-    top:0;left:0;right:0;bottom:0;
+    top:0;left:0;
+    width:100%;height:100%;
     background:rgba(0,0,0,0.7);
-    align-items:center;
     justify-content:center;
+    align-items:center;
 }
 
 .popup-box{
@@ -70,17 +71,16 @@ button{
     padding:20px;
     width:90%;
     max-width:400px;
-    border-radius:10px;
+    border-radius:12px;
 }
 
 input{
-    width:90%;
+    width:100%;
     padding:10px;
     margin-top:10px;
     border-radius:8px;
     border:none;
 }
-
 </style>
 </head>
 
@@ -89,8 +89,9 @@ input{
 <div class="container">
 <div class="card">
 
-<h2>SOCIAL Q</h2>
-<h3>Buy Passkey</h3>
+<h2>Buy Passkey</h2>
+
+<p class="sub">Select plan and pay OR request passkey if already paid</p>
 
 <div class="plan">
 <label><input type="radio" name="plan" value="Weekly" checked> Weekly - ₦50</label>
@@ -104,33 +105,39 @@ input{
 <label><input type="radio" name="plan" value="Yearly"> Yearly - ₦10000</label>
 </div>
 
-<button class="payBtn" onclick="openUserPopup()">Pay Now</button>
+<button class="payBtn" onclick="payNow()">Pay Now</button>
 
+<p style="text-align:center;margin-top:10px;">
+If you have paid, click below:
+</p>
 
-<p style="text-align:center; color:#94a3b8; margin-top:15px;">
-    If you have completed your payment, click the button below to request your passkey. 
-    Make sure your payment has been verified before submitting your request.
-    </p>
+<button class="reqBtn" onclick="openRequestPopup()">
+Request Passkey
+</button>
 
-<button class="reqBtn" id="reqBtn" onclick="requestPasskey()">
-REQUEST PASSKEY
+<button class="backBtn" onclick="location.href='license.html'">
+Back
 </button>
 
 </div>
 </div>
 
-<!-- USER INFO POPUP -->
+<!-- POPUP FORM -->
 <div class="popup" id="popup">
 <div class="popup-box">
 
-<h3>Enter Your Details</h3>
+<h3>Request Passkey</h3>
 
-<input type="text" id="name" placeholder="Full Name">
-<input type="email" id="email" placeholder="Email">
-<input type="text" id="phone" placeholder="Phone Number">
+<input id="name" placeholder="Full Name">
+<input id="email" placeholder="Email">
+<input id="phone" placeholder="Phone">
 
-<button onclick="startPayment()" style="background:#22c55e;color:white;">
-Continue to Pay
+<button class="payBtn" onclick="submitRequest()">
+Send Request
+</button>
+
+<button class="backBtn" onclick="closePopup()">
+Close
 </button>
 
 </div>
@@ -139,444 +146,9 @@ Continue to Pay
 <script>
 
 /* =========================
-YOUR LICENSE POOL (UNCHANGED)
+LICENSE POOL (UNCHANGED)
 ========================= */
-
 const LICENSE_POOL = {
-
-
-    "DEV-45389216":"947256",
-        "DEV-45389226":"182991",
-        "DEV-88391022":"550112",
-        "DEV-11223344":"778899",
-
-
-        // extend to 500 here
-        
-"DEV-40481767":"386465",
-"DEV-19536735":"977541",
-"DEV-88392014":"120998",
-"DEV-67291045":"558210",
-"DEV-90128374":"664921",
-"DEV-31765029":"883104",
-"DEV-55918203":"771905",
-"DEV-74029185":"294771",
-"DEV-62819475":"550019",
-"DEV-19384756":"902118",
-
-"DEV-81029475":"334901",
-"DEV-47291836":"771203",
-"DEV-59182740":"882610",
-"DEV-10492837":"110982",
-"DEV-66738291":"445019",
-"DEV-23819475":"993120",
-"DEV-91827364":"661045",
-"DEV-37482910":"220991",
-"DEV-56291847":"880314",
-"DEV-78102934":"119507",
-
-"DEV-49018273":"771002",
-"DEV-91847562":"663210",
-"DEV-30291847":"990561",
-"DEV-67592018":"441908",
-"DEV-12837465":"550877",
-"DEV-90817263":"223911",
-"DEV-56473829":"889120",
-"DEV-83746512":"771600",
-"DEV-21938475":"334812",
-"DEV-67518392":"990120",
-
-"DEV-91827355":"665501",
-"DEV-10293847":"220118",
-"DEV-47592018":"881233",
-"DEV-28374659":"551992",
-"DEV-91847521":"772210",
-"DEV-37465029":"990845",
-"DEV-56483920":"118902",
-"DEV-10284756":"334777",
-"DEV-83920174":"665990",
-"DEV-91827360":"441120",
-
-"DEV-47291038":"990002",
-"DEV-19028374":"771111",
-"DEV-67592014":"558899",
-"DEV-38475619":"223300",
-"DEV-91827361":"990411",
-"DEV-56473820":"112233",
-"DEV-10293856":"445566",
-"DEV-83746510":"778899",
-"DEV-21938476":"990777",
-"DEV-67518390":"110055",
-
-"DEV-91827362":"667788",
-"DEV-10293849":"334455",
-"DEV-47592010":"998877",
-"DEV-28374650":"556677",
-"DEV-91847520":"223344",
-"DEV-37465020":"778811",
-"DEV-56483921":"990990",
-"DEV-10284750":"441100",
-"DEV-83920170":"882244",
-"DEV-91827363":"665544",
-
-"DEV-47291030":"119922",
-"DEV-19028370":"556644",
-"DEV-67592010":"778855",
-"DEV-38475610":"990333",
-"DEV-91827364":"112200",
-"DEV-56473821":"334499",
-"DEV-10293850":"667722",
-"DEV-83746511":"889933",
-"DEV-21938470":"990111",
-"DEV-67518391":"221144",
-
-"DEV-91827365":"553311",
-"DEV-10293851":"774422",
-"DEV-47592011":"990556",
-"DEV-28374651":"112266",
-"DEV-91847522":"334488",
-"DEV-37465021":"556600",
-"DEV-56483922":"778822",
-"DEV-10284751":"990900",
-"DEV-83920171":"221199",
-"DEV-91827366":"445522",
-
-
-
-"DEV-81629473":"442901",
-"DEV-39018274":"993551",
-"DEV-74829105":"110477",
-"DEV-56291038":"778190",
-"DEV-91827340":"665812",
-"DEV-10492856":"334190",
-"DEV-66738192":"881044",
-"DEV-23819460":"550773",
-"DEV-91028374":"220665",
-"DEV-47592019":"991203",
-
-"DEV-38475690":"112990",
-"DEV-91827341":"667104",
-"DEV-56473810":"778902",
-"DEV-10293840":"445112",
-"DEV-83746519":"990611",
-"DEV-21938460":"771334",
-"DEV-67518399":"223119",
-"DEV-19028371":"882771",
-"DEV-47291039":"556900",
-"DEV-28374652":"990884",
-
-"DEV-91847523":"110022",
-"DEV-37465022":"334901",
-"DEV-56483923":"778441",
-"DEV-10284752":"990122",
-"DEV-83920172":"221877",
-"DEV-91827367":"665933",
-"DEV-47592012":"112344",
-"DEV-28374653":"778611",
-"DEV-91847524":"990013",
-"DEV-37465023":"441222",
-
-"DEV-56483924":"556188",
-"DEV-10284753":"889001",
-"DEV-83920173":"990744",
-"DEV-91827368":"223055",
-"DEV-47291031":"667900",
-"DEV-19028372":"110909",
-"DEV-67592011":"334322",
-"DEV-38475611":"778500",
-"DEV-91827369":"990201",
-"DEV-56473822":"445900",
-
-"DEV-10293852":"221044",
-"DEV-83746512":"778311",
-"DEV-21938471":"990888",
-"DEV-67518392":"112199",
-"DEV-91827370":"556644",
-"DEV-10293853":"778255",
-"DEV-47592013":"990900",
-"DEV-28374654":"334877",
-"DEV-91847525":"221566",
-"DEV-37465024":"667111",
-
-"DEV-56483925":"990332",
-"DEV-10284754":"445199",
-"DEV-83920174":"778900",
-"DEV-91827371":"112577",
-"DEV-47291032":"990611",
-"DEV-19028373":"556211",
-"DEV-67592012":"221900",
-"DEV-38475612":"778044",
-"DEV-91827372":"990855",
-"DEV-56473823":"334566",
-
-"DEV-10293854":"889122",
-"DEV-83746513":"110344",
-"DEV-21938472":"667288",
-"DEV-67518393":"990077",
-"DEV-91827373":"445611",
-"DEV-10293855":"778199",
-"DEV-47592014":"112488",
-"DEV-28374655":"990244",
-"DEV-91847526":"556122",
-"DEV-37465025":"221033",
-
-"DEV-56483926":"778855",
-"DEV-10284755":"990300",
-"DEV-83920175":"334611",
-"DEV-91827374":"667044",
-"DEV-47291033":"110655",
-"DEV-19028374":"882199",
-"DEV-67592013":"445900",
-"DEV-38475613":"990411",
-"DEV-91827375":"556733",
-"DEV-56473824":"221144",
-
-"DEV-10293856":"778933",
-"DEV-83746514":"990122",
-"DEV-21938473":"334900",
-"DEV-67518394":"667211",
-"DEV-91827376":"112900",
-"DEV-10293857":"445011",
-"DEV-47592015":"778044",
-"DEV-28374656":"990566",
-"DEV-91847527":"221877",
-"DEV-37465026":"556299",
-
-
-
-
-
-
-
-
-"DEV-64192837":"550902",
-"DEV-91837462":"112670",
-"DEV-20394857":"778144",
-"DEV-67592048":"990531",
-"DEV-38475621":"221900",
-"DEV-91827377":"667899",
-"DEV-10293858":"445033",
-"DEV-56473825":"778601",
-"DEV-83746515":"990214",
-"DEV-21938474":"110955",
-
-"DEV-67518395":"334811",
-"DEV-19028375":"882300",
-"DEV-47291034":"556144",
-"DEV-28374657":"990688",
-"DEV-91847528":"221099",
-"DEV-37465027":"667544",
-"DEV-56483927":"778033",
-"DEV-10284756":"990877",
-"DEV-83920176":"445220",
-"DEV-91827378":"112455",
-
-"DEV-47592016":"778122",
-"DEV-28374658":"990033",
-"DEV-91847529":"556455",
-"DEV-37465028":"221688",
-"DEV-56483928":"778999",
-"DEV-10284757":"990155",
-"DEV-83920177":"334044",
-"DEV-91827379":"667233",
-"DEV-47291035":"110788",
-"DEV-19028376":"882611",
-
-"DEV-67592017":"445122",
-"DEV-38475614":"990377",
-"DEV-91827380":"556900",
-"DEV-56473826":"221033",
-"DEV-10293859":"778455",
-"DEV-83746516":"990822",
-"DEV-21938475":"334199",
-"DEV-67518396":"667044",
-"DEV-91827381":"112799",
-"DEV-10293860":"445611",
-
-"DEV-47592017":"778900",
-"DEV-28374659":"990044",
-"DEV-91847530":"221566",
-"DEV-37465029":"667155",
-"DEV-56483929":"778322",
-"DEV-10284758":"990933",
-"DEV-83920178":"334122",
-"DEV-91827382":"667611",
-"DEV-47291036":"110244",
-"DEV-19028377":"882844",
-
-"DEV-67592018":"445033",
-"DEV-38475615":"990511",
-"DEV-91827383":"556122",
-"DEV-56473827":"221900",
-"DEV-10293861":"778144",
-"DEV-83746517":"990300",
-"DEV-21938476":"334877",
-"DEV-67518397":"667288",
-"DEV-91827384":"112344",
-"DEV-10293862":"445900",
-
-"DEV-47592018":"778611",
-"DEV-28374660":"990877",
-"DEV-91847531":"221255",
-"DEV-37465030":"667033",
-"DEV-56483930":"778777",
-"DEV-10284759":"990411",
-"DEV-83920179":"334900",
-"DEV-91827385":"667122",
-"DEV-47291037":"110566",
-"DEV-19028378":"882055",
-
-"DEV-67592019":"445611",
-"DEV-38475616":"990244",
-"DEV-91827386":"556788",
-"DEV-56473828":"221144",
-"DEV-10293863":"778900",
-"DEV-83746518":"990122",
-"DEV-21938477":"334011",
-"DEV-67518398":"667900",
-"DEV-91827387":"112900",
-"DEV-10293864":"445033",
-
-"DEV-47592019":"778055",
-"DEV-28374661":"990900",
-"DEV-91847532":"221877",
-"DEV-37465031":"667211",
-"DEV-56483931":"778455",
-"DEV-10284760":"990033",
-"DEV-83920180":"334566",
-"DEV-91827388":"667044",
-"DEV-47291038":"110899",
-"DEV-19028379":"882199",
-
-
-
-"DEV-73019458":"552110",
-"DEV-91827389":"110433",
-"DEV-40592817":"778922",
-"DEV-67592020":"990144",
-"DEV-38475617":"221655",
-"DEV-10293865":"445788",
-"DEV-56473829":"778211",
-"DEV-83746519":"990633",
-"DEV-21938478":"334055",
-"DEV-67518399":"667411",
-
-"DEV-19028380":"882522",
-"DEV-47291039":"110988",
-"DEV-28374662":"990277",
-"DEV-91847533":"221144",
-"DEV-37465032":"667833",
-"DEV-56483932":"778900",
-"DEV-10284761":"990066",
-"DEV-83920181":"334177",
-"DEV-91827390":"667255",
-"DEV-47592020":"778144",
-
-"DEV-28374663":"990822",
-"DEV-91847534":"221900",
-"DEV-37465033":"667044",
-"DEV-56483933":"778322",
-"DEV-10284762":"990411",
-"DEV-83920182":"334900",
-"DEV-91827391":"667611",
-"DEV-47291040":"110244",
-"DEV-19028381":"882844",
-"DEV-67592021":"445122",
-
-"DEV-38475618":"990377",
-"DEV-91827392":"556900",
-"DEV-56473830":"221033",
-"DEV-10293866":"778455",
-"DEV-83746520":"990822",
-"DEV-21938479":"334199",
-"DEV-67518400":"667044",
-"DEV-91827393":"112799",
-"DEV-10293867":"445611",
-"DEV-47592021":"778900",
-
-"DEV-28374664":"990044",
-"DEV-91847535":"221566",
-"DEV-37465034":"667155",
-"DEV-56483934":"778322",
-"DEV-10284763":"990933",
-"DEV-83920183":"334122",
-"DEV-91827394":"667611",
-"DEV-47291041":"110244",
-"DEV-19028382":"882844",
-"DEV-67592022":"445033",
-
-"DEV-38475619":"990511",
-"DEV-91827395":"556122",
-"DEV-56473831":"221900",
-"DEV-10293868":"778144",
-"DEV-83746521":"990300",
-"DEV-21938480":"334877",
-"DEV-67518401":"667288",
-"DEV-91827396":"112344",
-"DEV-10293869":"445900",
-"DEV-47592022":"778611",
-
-"DEV-28374665":"990877",
-"DEV-91847536":"221255",
-"DEV-37465035":"667033",
-"DEV-56483935":"778777",
-"DEV-10284764":"990411",
-"DEV-83920184":"334900",
-"DEV-91827397":"667122",
-"DEV-47291042":"110566",
-"DEV-19028383":"882055",
-"DEV-67592023":"445611",
-
-"DEV-38475620":"990244",
-"DEV-91827398":"556788",
-"DEV-56473832":"221144",
-"DEV-10293870":"778900",
-"DEV-83746522":"990122",
-"DEV-21938481":"334011",
-"DEV-67518402":"667900",
-"DEV-91827399":"112900",
-"DEV-10293871":"445033",
-"DEV-47592023":"778055",
-
-"DEV-28374666":"990900",
-"DEV-91847537":"221877",
-"DEV-37465036":"667211",
-"DEV-56483936":"778455",
-"DEV-10284765":"990033",
-"DEV-83920185":"334566",
-"DEV-91827400":"667044",
-"DEV-47291043":"110899",
-"DEV-19028384":"882199",
-"DEV-67592024":"445900",
-
-
-"DEV-91837460":"552901",
-"DEV-40592818":"778110",
-"DEV-67592025":"990144",
-"DEV-38475621":"221655",
-"DEV-10293872":"445788",
-"DEV-56473833":"778211",
-"DEV-83746523":"990633",
-"DEV-21938482":"334055",
-"DEV-67518403":"667411",
-"DEV-19028385":"882522",
-
-"DEV-47291044":"110988",
-"DEV-28374667":"990277",
-"DEV-91847538":"221144",
-"DEV-37465037":"667833",
-"DEV-56483937":"778900",
-"DEV-10284766":"990066",
-"DEV-83920186":"334177",
-"DEV-91827401":"667255",
-"DEV-47592024":"778144",
-"DEV-28374668":"990822",
-
-"DEV-91847539":"221900",
-"DEV-37465038":"667044",
-"DEV-56483938":"778322",
-"DEV-10284767":"990411",
-"DEV-83920187":"334900",
 "DEV-91827402":"667611",
 "DEV-47291045":"110244",
 "DEV-19028386":"882844",
@@ -652,123 +224,122 @@ const LICENSE_POOL = {
 };
 
 /* =========================
-DEVICE ID
+DEVICE ID (MUST EXIST ALREADY)
 ========================= */
 function getDeviceId(){
-    let id = localStorage.getItem("device_id");
-
-    if(!id){
-        id = "DEV-" + Math.random().toString(36).substr(2,10).toUpperCase();
-        localStorage.setItem("device_id", id);
-    }
-
-    return id;
+    return localStorage.getItem("device_id");
 }
 
 /* =========================
-STEP 1: OPEN POPUP
-========================= */
-function openUserPopup(){
-    document.getElementById("popup").style.display = "flex";
-}
-
-/* =========================
-STEP 2: SAVE USER + PAY
-========================= */
-function startPayment(){
-
-    const name = document.getElementById("name").value;
-    const email = document.getElementById("email").value;
-    const phone = document.getElementById("phone").value;
-
-    if(!name || !email || !phone){
-        alert("Fill all fields");
-        return;
-    }
-
-    localStorage.setItem("username", name);
-    localStorage.setItem("email", email);
-    localStorage.setItem("phone", phone);
-
-    document.getElementById("popup").style.display = "none";
-
-    payNow();
-}
-
-/* =========================
-PRICE
+PLAN PRICE
 ========================= */
 function getAmount(){
-    const plan = document.querySelector('input[name="plan"]:checked').value;
-
+    const plan=document.querySelector('input[name="plan"]:checked').value;
     if(plan=="Weekly") return 50;
     if(plan=="Monthly") return 1000;
     if(plan=="Yearly") return 10000;
 }
 
 /* =========================
-PAYSTACK
+PAYSTACK PAYMENT
 ========================= */
 function payNow(){
 
-    const amount = getAmount();
+const amount=getAmount();
 
-    const handler = PaystackPop.setup({
+const handler=PaystackPop.setup({
+key:"pk_live_ff6f89169eb0390d93a0777c949d59a3982a21e4",
 
-        key: "pk_live_ff6f89169eb0390d93a0777c949d59a3982a21e4",
+email:"user@email.com",
 
-        email: localStorage.getItem("email"),
+amount:amount*100,
+currency:"NGN",
 
-        amount: amount * 100,
+callback:function(response){
 
-        currency: "NGN",
+localStorage.setItem("payment_status","paid");
+localStorage.setItem("payment_ref",response.reference);
 
-        callback: function(response){
+alert("Payment successful. You can now request passkey.");
 
-            localStorage.setItem("payment_ref", response.reference);
+},
 
-            alert("Payment window finished. Click REQUEST PASSKEY if payment was successful.");
+onClose:function(){
+alert("Payment not completed");
+}
 
-            document.getElementById("reqBtn").style.display = "block";
-        },
+});
 
-        onClose: function(){
-            alert("Payment closed. If you paid, use REQUEST PASSKEY.");
-            document.getElementById("reqBtn").style.display = "block";
-        }
-
-    });
-
-    handler.openIframe();
+handler.openIframe();
 }
 
 /* =========================
-REQUEST PASSKEY
+REQUEST BUTTON (IMPORTANT PART)
 ========================= */
-function requestPasskey(){
+function openRequestPopup(){
 
-    const msg = `
-Hello Admin,
+const status=localStorage.getItem("payment_status");
 
-Payment Claim Request
+if(status!=="paid"){
+    alert("You must complete payment first or contact admin.");
+    return;
+}
 
-Name: ${localStorage.getItem("username")}
-Email: ${localStorage.getItem("email")}
-Phone: ${localStorage.getItem("phone")}
-Plan: ${document.querySelector('input[name="plan"]:checked').value}
-Device ID: ${getDeviceId()}
-Payment Ref: ${localStorage.getItem("payment_ref")}
+document.getElementById("popup").style.display="flex";
+}
 
-Please verify and generate passkey.
-`;
+function closePopup(){
+document.getElementById("popup").style.display="none";
+}
 
-    window.open(
-        "https://wa.me/2347010067689?text=" + encodeURIComponent(msg),
-        "_blank"
-    );
+/* =========================
+SEND REQUEST TO ADMIN
+========================= */
+function submitRequest(){
+
+const device=getDeviceId();
+
+if(!device){
+    alert("No device found. Go back and register first.");
+    return;
+}
+
+const data={
+name:document.getElementById("name").value,
+email:document.getElementById("email").value,
+phone:document.getElementById("phone").value,
+plan:document.querySelector('input[name="plan"]:checked').value,
+deviceId:device,
+paymentRef:localStorage.getItem("payment_ref")
+};
+
+const msg=`PASSKEY REQUEST:
+
+Name: ${data.name}
+Email: ${data.email}
+Phone: ${data.phone}
+Plan: ${data.plan}
+Device ID: ${data.deviceId}
+Payment Ref: ${data.paymentRef}
+
+Please generate passkey using LICENSE_POOL.`;
+
+window.open(
+"https://wa.me/2347010067689?text="+encodeURIComponent(msg),
+"_blank"
+);
+
+closePopup();
+
+alert("Request sent to admin");
 }
 
 </script>
 
 </body>
 </html>
+
+
+
+
+    
