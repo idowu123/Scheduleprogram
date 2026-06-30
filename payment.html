@@ -280,13 +280,22 @@ function openRequestPopup(){
 
 const status=localStorage.getItem("payment_status");
 
-if(status!=="paid"){
-    alert("You must complete payment first or contact admin.");
-    return;
+function openRequestPopup(){
+
+    const status = localStorage.getItem("payment_status");
+
+    // we DON'T block anymore
+    // we only label the request type
+
+    if(status === "paid"){
+        console.log("Auto verified payment flag found");
+    }else{
+        console.log("Manual verification required");
+    }
+
+    document.getElementById("popup").style.display = "flex";
 }
 
-document.getElementById("popup").style.display="flex";
-}
 
 function closePopup(){
 document.getElementById("popup").style.display="none";
